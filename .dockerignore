@@ -29,3 +29,15 @@
 !/storage/.keep
 /tmp/storage/*
 !/tmp/storage/.keep
+
+# Editor and system files
+*.swp
+*.swo
+*.DS_Store
+.vscode
+
+# Test/coverage output
+coverage
+
+# Node modules (in case of front-end assets or JS tools)
+/node_modules

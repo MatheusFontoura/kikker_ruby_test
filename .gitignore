@@ -31,3 +31,12 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Editor and system files
+*.swp
+*.swo
+*.DS_Store
+.vscode
+
+# Test/coverage output
+coverage
