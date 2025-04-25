@@ -12,6 +12,8 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :posts, only: [:create]
       resources :ratings, only: [:create]
+      get 'top_posts', to: 'top_rated_posts#index'
+      get 'ips', to: 'ips#index'
     end
-  end
+  end  
 end
