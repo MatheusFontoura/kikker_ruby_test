@@ -5,8 +5,8 @@ class CreatePosts < ActiveRecord::Migration[7.1]
       t.string :title, null: false
       t.text :body, null: false
       t.string :ip, null: false
-    
+
       t.timestamps
-    end    
+    end
   end
 end

@@ -18,17 +18,18 @@ TOTAL_RATINGS = (TOTAL_POSTS * 0.75).to_i
 POSTS_BATCH_SIZE = 1000
 RATINGS_BATCH_SIZE = 1000
 
-API_URL = ENV.fetch('API_URL', 'http://web:3000') 
+API_URL = ENV.fetch('API_URL', 'http://web:3000')
 # Se rodar fora do docker: 'http://localhost:3001'
 
 # 50 IPs
 ips = (1..50).map { |i| "192.168.0.#{i}" }
 
-puts "Criando usuários..."
+Rails.logger.debug 'Criando usuários...'
 
 users = Array.new(TOTAL_USERS) { |i| "user_#{i}_#{SecureRandom.hex(3)}" }
 user_ids = []
 
+# rubocop:disable Metrics/BlockLength
 users.each_with_index do |login, index|
   body = {
     title: "Seed Post User #{index}",
@@ -50,20 +51,20 @@ users.each_with_index do |login, index|
     parsed = JSON.parse(response.body)
     user_ids << parsed['user']['id']
   else
-    puts "Erro criando usuário #{login}. Novamente..."
+    Rails.logger.debug { "Erro criando usuário #{login}. Novamente..." }
     retry_response = request.run
     if retry_response.success?
       parsed = JSON.parse(retry_response.body)
       user_ids << parsed['user']['id']
     else
-      puts "Falha ao criar usuário #{login} após retry. Código: #{retry_response.code}"
+      Rails.logger.debug { "Falha ao criar usuário #{login} após retry. Código: #{retry_response.code}" }
     end
   end
 end
 
-puts "Usuários criados: #{user_ids.count}"
+Rails.logger.debug { "Usuários criados: #{user_ids.count}" }
 
-puts "Criando posts..."
+Rails.logger.debug 'Criando posts...'
 
 posts_ids = []
 
@@ -90,13 +91,13 @@ posts_ids = []
         parsed = JSON.parse(response.body)
         posts_ids << parsed['post']['id'] if parsed
       else
-        puts "Erro criando post. Tentando novamente..."
+        Rails.logger.debug 'Erro criando post. Tentando novamente...'
         retry_response = request.run
         if retry_response.success?
           parsed = JSON.parse(retry_response.body)
           posts_ids << parsed['post']['id'] if parsed
         else
-          puts "Falha ao criar post após retry. Código: #{retry_response.code}"
+          Rails.logger.debug { "Falha ao criar post após retry. Código: #{retry_response.code}" }
         end
       end
     end
@@ -105,12 +106,12 @@ posts_ids = []
   end
 
   hydra.run
-  puts "Batch de #{batch.size} posts criada!"
+  Rails.logger.debug { "Batch de #{batch.size} posts criada!" }
 end
 
-puts "Total de posts criados: #{posts_ids.size}"
+Rails.logger.debug { "Total de posts criados: #{posts_ids.size}" }
 
-puts "Criando ratings..."
+Rails.logger.debug 'Criando ratings...'
 
 posts_ids.sample(TOTAL_RATINGS).each_slice(RATINGS_BATCH_SIZE) do |batch|
   hydra = Typhoeus::Hydra.new(max_concurrency: 40)
@@ -133,9 +134,11 @@ posts_ids.sample(TOTAL_RATINGS).each_slice(RATINGS_BATCH_SIZE) do |batch|
 
     request.on_complete do |response|
       unless response.success?
-        puts "Erro criando rating. Tentando novamente..."
+        Rails.logger.debug 'Erro criando rating. Tentando novamente...'
         retry_response = request.run
-        puts "Falha ao criar rating após retry. Código: #{retry_response.code}" unless retry_response.success?
+        unless retry_response.success?
+          Rails.logger.debug { "Falha ao criar rating após retry. Código: #{retry_response.code}" }
+        end
       end
     end
 
@@ -143,7 +146,8 @@ posts_ids.sample(TOTAL_RATINGS).each_slice(RATINGS_BATCH_SIZE) do |batch|
   end
 
   hydra.run
-  puts "Batch de #{batch.size} ratings criado!"
+  Rails.logger.debug { "Batch de #{batch.size} ratings criado!" }
 end
+# rubocop:enable Metrics/BlockLength
 
-puts "Seeds feitas"
+Rails.logger.debug 'Seeds feitas'

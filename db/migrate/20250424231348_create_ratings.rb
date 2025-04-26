@@ -8,7 +8,7 @@ class CreateRatings < ActiveRecord::Migration[7.1]
       t.timestamps
     end
 
-    add_index :ratings, [:post_id, :user_id], unique: true
+    add_index :ratings, %i[post_id user_id], unique: true
     add_check_constraint :ratings, 'value BETWEEN 1 AND 5', name: 'rating_value_range'
   end
 end

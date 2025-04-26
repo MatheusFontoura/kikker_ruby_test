@@ -1,0 +1,8 @@
+pt-BR:
+  activerecord:
+    errors:
+      models:
+        rating:
+          attributes:
+            user_id:
+              taken: "só é permitido um voto por post"
