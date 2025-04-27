@@ -50,6 +50,7 @@ RUN useradd rails --create-home --shell /bin/bash && \
 COPY bin/docker-entrypoint.sh /usr/bin/docker-entrypoint
 RUN chmod +x /usr/bin/docker-entrypoint
 
+RUN chown -R rails:rails /usr/local/bundle
 USER rails:rails
 
 ENV PATH="/usr/local/bundle/bin:${PATH}"

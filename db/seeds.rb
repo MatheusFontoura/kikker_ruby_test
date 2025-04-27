@@ -146,7 +146,7 @@ posts_ids.sample(TOTAL_RATINGS).each_slice(RATINGS_BATCH_SIZE) do |batch|
   end
 
   hydra.run
-  Rails.logger.debug { "Batch de #{batch.size} ratings criado!" }
+  Rails.logger.debug { "Batch de #{batch.size} ratings criado" }
 end
 # rubocop:enable Metrics/BlockLength
 
