@@ -52,19 +52,27 @@ docker-compose exec web bundle exec rails db:migrate
 ```
 
 **4. Execute os testes automatizados**
-`docker-compose exec web bundle exec rspec`
+```
+docker-compose exec web bundle exec rspec
+```
 
 **5. Rode as seeds** 
-(Se rodar as seeds antes dos testes automatizados, verifique-se de limpar a base de dados de testes)
 
-`docker-compose exec web bundle exec rails db:seed`
-OBS: Pode demorar.
+(Se rodar as seeds antes dos testes automatizados, verifique-se de limpar a base de dados de testes)
+```
+docker-compose exec web bundle exec rails db:seed
+```
+_OBS: Pode demorar._
 
 **6. Execute o RuboCop**
-`docker-compose exec web bundle exec rubocop`
+```
+docker-compose exec web bundle exec rubocop
+```
 
 **7. Verifique o banco de dados via console**
-`docker-compose exec web bundle exec rails console`
+```
+docker-compose exec web bundle exec rails console
+```
 
 Dentro do console:
 ```
@@ -74,9 +82,11 @@ Rating.count
 ```
 
 **🌐 Testes manuais via API**
-A aplicação estará rodando em: http://localhost:3001
+
+_A aplicação estará rodando em: http://localhost:3001_
 
 **8. Endpoints principais**
+
 Criar novo post
 ```
 curl -X POST http://localhost:3001/api/v1/posts \
@@ -86,7 +96,8 @@ curl -X POST http://localhost:3001/api/v1/posts \
 
 
 Avaliar um post
-(Substitua post_id e user_id conforme criado na request anterior)
+
+_(Substitua post_id e user_id conforme criado na request anterior)_
 ```
 curl -X POST http://localhost:3001/api/v1/ratings \
   -H "Content-Type: application/json" \
@@ -94,13 +105,19 @@ curl -X POST http://localhost:3001/api/v1/ratings \
 ```
 
 Listar Top Posts
-`curl http://localhost:3001/api/v1/top_posts`
+```
+curl http://localhost:3001/api/v1/top_posts
+```
 
 Listar IPs utilizados por múltiplos autores
-`curl http://localhost:3001/api/v1/ips`
+```
+curl http://localhost:3001/api/v1/ips
+```
 
 ⚠️ Testes de cenários de erro
+
 **9. Via API**
+
 Criar post inválido (sem título, corpo ou login)
 ```
 curl -X POST http://localhost:3001/api/v1/posts \
@@ -116,15 +133,28 @@ curl -X POST http://localhost:3001/api/v1/ratings \
 ```
 
 **10. Via console**
+
 Abra o console:
-`docker-compose exec web bundle exec rails console`
+```
+docker-compose exec web bundle exec rails console
+```
 
 Teste de avaliação duplicada (deve falhar)
-`Rating.create(post_id: 1, user_id: 1, value: 5) `  Deve retornar erro caso já exista via seeds ou API manual
-`Rating.create(post_id: 1, user_id: 1, value: 4) `  Deve retornar erro
+```
+Rating.create(post_id: 1, user_id: 1, value: 5) 
+```
+_Deve retornar erro caso já exista via seeds ou API manual_
+
+```
+Rating.create(post_id: 1, user_id: 1, value: 4) 
+```
+_Deve retornar erro_
+
 
 Teste de valor fora do permitido
-`Rating.create(post_id: 1, user_id: 2, value: 10)`
+```
+Rating.create(post_id: 1, user_id: 2, value: 10)
+```
 
 Exemplo de fluxo correto:
 ```
@@ -134,17 +164,20 @@ rating = Rating.create(post_id: post.id, user_id: user.id, value: 4)
 rating.persisted?
 ```
 
+----------------------------------------
 ### 🧠 Estratégia de Geração de Dados (db/seeds.rb)
 Para atender o desafio de 200.000 posts, cerca de 100 usuários e 75% dos posts com avaliações, o script de seeds utiliza:
-Limpeza de dados antes da criação (delete_all nas tabelas).
-Criação via API (Typhoeus) — respeitando o enunciado.
-Execução paralela usando Typhoeus::Hydra para melhorar o desempenho.
-Batches de criação de posts e avaliações (grupos de 1000 registros).
-Resiliência: Tentativas de recriação em caso de falhas nas requisições.
-50 IPs únicos e logins de usuários únicos usando SecureRandom.
+
+- Limpeza de dados antes da criação (delete_all nas tabelas).
+- Criação via API (Typhoeus).
+- Execução paralela usando Typhoeus::Hydra para melhorar o desempenho.
+- Batches de criação de posts e avaliações (grupos de 1000 registros).
+- Resiliência: Tentativas de recriação em caso de falhas nas requisições.
+- 50 IPs únicos e logins de usuários únicos usando SecureRandom.
 
 ### 🎯 Observações Finais
-Cobertura de testes RSpec para models, services e requests.
-Código validado por RuboCop.
-Projeto preparado para alta carga e múltiplas requisições simultâneas.
-100% rodando em containers Docker.
+
+- Cobertura de testes RSpec para models, services e requests.
+- Código validado por RuboCop.
+- Projeto preparado para alta carga e múltiplas requisições simultâneas.
+- 100% rodando em containers Docker.
